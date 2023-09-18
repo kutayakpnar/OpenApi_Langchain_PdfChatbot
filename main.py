@@ -6,9 +6,14 @@ from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 import os
+from dotenv import load_dotenv
 
-# Set OpenAI API key
-os.environ["OPENAI_API_KEY"] = "enter your openapi key here"
+# Load environment variables from the .env file
+load_dotenv()
+
+# Get the OpenAI API key from the environment variable
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
 
 # Function to process the uploaded PDF
 def process_pdf_with_langchain(uploaded_file, question):
@@ -31,7 +36,7 @@ def process_pdf_with_langchain(uploaded_file, question):
     texts = text_splitter.split_text(raw_text)
 
     # Download embeddings from OpenAI
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     document_search = FAISS.from_texts(texts, embeddings)
 
     # Load the Langchain QA chain
@@ -44,10 +49,10 @@ def process_pdf_with_langchain(uploaded_file, question):
     return answers
 
 # Streamlit app
-st.title("PDF Processing App")
+st.title("DAVON PDF CHATBOT")
 
 uploaded_file = st.file_uploader("Upload a PDF file", type=["pdf"])
-question = st.text_input("Enter a question:")
+question = st.text_input("Enter a question related to this file:")
 
 if uploaded_file is not None and question:
     if st.button("Process"):
